@@ -1,4 +1,4 @@
-package services;
+package utility;
 
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;

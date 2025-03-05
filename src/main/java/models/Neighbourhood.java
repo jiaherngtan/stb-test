@@ -5,8 +5,9 @@ import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.*;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
-import services.AssertFactory;
-import services.Common;
+
+import utility.AssertFactory;
+import utility.Common;
 
 import java.util.List;
 import java.util.Map;

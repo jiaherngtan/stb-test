@@ -8,8 +8,9 @@ import org.openqa.selenium.support.PageFactory;
 
 import org.openqa.selenium.support.ui.Wait;
 import org.openqa.selenium.support.ui.WebDriverWait;
-import services.AssertFactory;
-import services.Common;
+
+import utility.AssertFactory;
+import utility.Common;
 
 import java.time.Duration;
 

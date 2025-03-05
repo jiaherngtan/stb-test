@@ -1,4 +1,4 @@
-package services;
+package utility;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;

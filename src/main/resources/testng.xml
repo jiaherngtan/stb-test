@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<suite name="STB test Suite">
+    <test name="STB test">
+        <classes>
+            <class name="WebAppTest" />
+        </classes>
+    </test>
+</suite>

@@ -6,9 +6,9 @@ import models.Neighbourhood;
 import org.openqa.selenium.WebDriver;
 import org.testng.annotations.*;
 
-import services.AssertFactory;
-import services.Common;
-import services.WebDriverInit;
+import utility.AssertFactory;
+import utility.Common;
+import utility.WebDriverInit;
 
 import java.util.List;
 import java.util.Map;
