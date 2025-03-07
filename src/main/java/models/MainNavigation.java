@@ -6,14 +6,11 @@ import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
-import org.openqa.selenium.support.ui.Wait;
-import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.Assert;
 
 import utility.AssertFactory;
 import utility.Common;
 
-import java.time.Duration;
 import java.util.List;
 import java.util.Objects;
 
@@ -36,7 +33,7 @@ public class MainNavigation {
     @FindBy(xpath = "//header[contains(@class, 'stbHeader')]//*[text()='Neighbourhoods']")
     WebElement navNeighbourhoods;
 
-    @FindBy(xpath = "//a[text()='Featured Neighbourhoods']")
+    @FindBy(xpath = "//div[contains(@class, 'dropDownContainer')]//a[text()='Featured Neighbourhoods']")
     WebElement featuredNeighbourhoods;
 
     @FindBy(xpath = "//*[text()='Neighbourhoods']/following-sibling::div//a")
@@ -54,83 +51,76 @@ public class MainNavigation {
     }
 
     // Navigation
-    public void goToFeaturedNeighbourhoodsPage() {
-        // Hover to the neighbourhoods sub menu
+    public void hoverOverNeighbourhoodsMenu() {
+        // Hover to the neighbourhoods sub-menu
         Actions actions = new Actions(driver);
         actions.moveToElement(navNeighbourhoods).perform();
         Common.sleep(3);
+    }
+
+    // Navigation
+    public void goToFeaturedNeighbourhoodsPage() {
+        hoverOverNeighbourhoodsMenu();
+        Common.waitUntilVisible(featuredNeighbourhoods);
         Common.jsClickElement(driver, featuredNeighbourhoods);
     }
 
     // Navigation
     public void backToHomePage() {
         // Go back to home page by clicking the main logo
-        mainLogo.click();
+        Common.jsClickElement(driver, mainLogo);
     }
 
     public void verifyListOfNeighbourhoods(List<String> testData) {
-        try {
-            // hover to sub-menu
-            Actions actions = new Actions(driver);
-            actions.moveToElement(navNeighbourhoods).perform();
-            Common.sleep(3);
+        // Assert the number of selections
+        AssertFactory.assertSameValue(neighbourhoods.size(), testData.size());
 
-            // Verify selections are valid against test data
-            for (WebElement neighbourhood : neighbourhoods) {
-                // Get neighbourhood name and remove any inner tag
-                String neighbourhoodName = Objects.requireNonNull(neighbourhood.getDomProperty("innerHTML"))
-                        .split("<")[0];
-                Log.info(neighbourhoodName);
-                Assert.assertTrue(testData.contains(neighbourhoodName));
-            }
-
-            // Assert the number of selections
-            AssertFactory.assertSameValue(neighbourhoods.size(), testData.size());
-        } catch (NoSuchElementException | TimeoutException e) {
-            Log.error(e.getMessage());
+        // Verify selections are valid against test data
+        boolean listItemsAreValid = true;
+        for (WebElement neighbourhood : neighbourhoods) {
+            // Get neighbourhood name and remove any inner tag if there is any
+            String neighbourhoodName = Objects.requireNonNull(neighbourhood.getDomProperty("innerHTML"))
+                    .split("<")[0];
+            Log.info(neighbourhoodName);
+            if (!testData.contains(neighbourhoodName))
+                listItemsAreValid = false;
         }
+        Assert.assertTrue(listItemsAreValid);
     }
 
     public void verifyListContainsNeighbourhood(String target) {
-        try {
-            boolean selectionFound = false;
-            for (WebElement neighbourhood : neighbourhoods) {
-                // Get neighbourhood name and remove any inner tag
-                String neighbourhoodName = Objects.requireNonNull(neighbourhood.getDomProperty("innerHTML"))
-                        .split("<")[0];
-                if (neighbourhoodName.equals(target)) {
-                    selectionFound = true;
-                    break;
-                }
+        boolean selectionFound = false;
+        for (WebElement neighbourhood : neighbourhoods) {
+            // Get neighbourhood name and remove any inner tag if there is any
+            String neighbourhoodName = Objects.requireNonNull(neighbourhood.getDomProperty("innerHTML"))
+                    .split("<")[0];
+            if (neighbourhoodName.equalsIgnoreCase(target)) {
+                selectionFound = true;
+                break;
             }
-            Assert.assertTrue(selectionFound);
-            Log.info("Passed - selection {} found", target);
-        } catch (NoSuchElementException | TimeoutException e) {
-            Log.error(e.getMessage());
         }
+        Assert.assertTrue(selectionFound);
+        Log.info("Passed - selection {} found", target);
     }
 
     public void verifySearchFunction(String searchString) {
-        try {
-            // Verify search button is visible and clickable
-            AssertFactory.assertElementIsDisplayed(btnSearch);
-            btnSearch.click();
+        // Verify search button is visible and clickable
+        AssertFactory.assertElementIsDisplayed(btnSearch);
+        btnSearch.click();
 
-            // Verify search field is visible and perform search
-            Wait<WebDriver> wait = new WebDriverWait(driver, Duration.ofSeconds(5));
-            wait.until(d -> searchField.isDisplayed());
-            searchField.sendKeys(searchString);
-            Common.sleep(1);
-            searchField.sendKeys(Keys.ENTER);
-            Common.sleep(5);
+        // Verify search field is visible and perform search
+        Common.waitUntilVisible(searchField);
+        Common.sleep(1);
+        searchField.sendKeys(searchString);
+        Common.sleep(1);
+        searchField.sendKeys(Keys.ENTER);
+        Common.sleep(5);
 
-            // Select the first search result
-            WebElement firstSelection = driver.findElement(By.xpath(
-                    "//div[@class='searchResult']//a"));
-            firstSelection.click();
-            Common.sleep(10);
-        } catch (NoSuchElementException | TimeoutException e) {
-            Log.error(e.getMessage());
-        }
+        // Select the first search result
+        WebElement firstSelection = driver.findElement(By.xpath(
+                "//div[@class='searchResult']//a"));
+        Common.waitUntilVisible(firstSelection);
+        firstSelection.click();
+        Common.sleep(5);
     }
 }

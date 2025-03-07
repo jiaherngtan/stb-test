@@ -16,6 +16,7 @@ public class AssertFactory {
         try {
             if (element.isDisplayed()) {
                 Log.info("Passed assert element is displayed.");
+                Log.info("Element: {}", element.getText());
                 elementSize = 1;
             }
         } catch (NoSuchElementException ex) {

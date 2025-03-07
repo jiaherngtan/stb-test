@@ -6,13 +6,8 @@ import org.openqa.selenium.*;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
 
-import org.openqa.selenium.support.ui.Wait;
-import org.openqa.selenium.support.ui.WebDriverWait;
-
 import utility.AssertFactory;
 import utility.Common;
-
-import java.time.Duration;
 
 public class FeaturedNeighbourhoods {
 
@@ -31,48 +26,42 @@ public class FeaturedNeighbourhoods {
     WebElement currentSelection;
 
     public void verifyFeaturedNeighbourhoods(String defaultSelection) {
-        try {
-            // Verify able to visit "Featured Neighbourhoods" by checking the label under <span>
-            WebElement featuredNeighbourhoodTxt = driver.findElement(By.xpath(
-                    "//span[text()='Featured Neighbourhoods']"));
-            AssertFactory.assertElementIsDisplayed(featuredNeighbourhoodTxt);
+        // Verify able to visit "Featured Neighbourhoods" by checking the label under <span>
+        WebElement featuredNeighbourhoodTxt = driver.findElement(By.xpath(
+                "//span[text()='Featured Neighbourhoods']"));
+        AssertFactory.assertElementIsDisplayed(featuredNeighbourhoodTxt);
 
-            // Verify the default selection
-            // Current selection can be determined by current expanded selection with keyword "expand" under class
-            AssertFactory.assertElementIsDisplayed(currentSelection);
-            String currentSelectionTitle = currentSelection.getDomAttribute("data-id");
-            assert currentSelectionTitle != null;
-            AssertFactory.assertSameText(currentSelectionTitle, defaultSelection);
-        } catch (NoSuchElementException | TimeoutException e) {
-            Log.error(e.getMessage());
-        }
+        // Verify the default selection
+        // Current selection can be determined by current expanded selection with keyword "expand" under class
+        Common.waitUntilVisible(currentSelection);
+        String currentSelectionTitle = currentSelection.getDomAttribute("data-id");
+        assert currentSelectionTitle != null;
+        AssertFactory.assertSameText(currentSelectionTitle, defaultSelection);
     }
 
     public WebElement getIcon(String icon) {
         // Identify the xpath of the icon and click it
         String selectionXPath = String.format(
                 "//div[contains(@class, 'stb-neighbourhood_map-icon')]/img[@alt='%s']", icon);
-        return driver.findElement(By.xpath(selectionXPath));
+        WebElement selectedIcon = driver.findElement(By.xpath(selectionXPath));
+        Common.waitUntilVisible(selectedIcon);
+        return selectedIcon;
     }
 
-    public void selectNeighbourhoodFromMap(String icon) {
-        try {
-            // Click the icon
-            Common.jsClickElement(driver, getIcon(icon));
-            Common.sleep(3);
+    public void selectNeighbourhoodFromMap(String selectedNeighbourhood) {
+        // Click the icon
+        Common.jsClickElement(driver, getIcon(selectedNeighbourhood));
+        Common.sleep(3);
 
-            // Verify the current selection is updated
-            String currentSelectionTitle = currentSelection.getDomAttribute("data-id");
-            assert currentSelectionTitle != null;
-            AssertFactory.assertSameText(currentSelectionTitle, icon);
-        } catch (NoSuchElementException | TimeoutException e) {
-            Log.error(e.getMessage());
-        }
+        // Verify the current selection is updated
+        String currentSelectionTitle = currentSelection.getDomAttribute("data-id");
+        assert currentSelectionTitle != null;
+        AssertFactory.assertSameText(currentSelectionTitle, selectedNeighbourhood);
     }
 
-    public void verifyMapIconState(String icon, boolean hovered) {
+    public void verifyMapIconState(String selectedNeighbourhood, boolean hovered) {
         // State "default-state" if not selected, state will be "hover-state" if selected
-        WebElement elem = getIcon(icon);
+        WebElement elem = getIcon(selectedNeighbourhood);
         String property = elem.getDomProperty("src");
         if (hovered) {
             AssertFactory.assertContainsText(property, "hover-state");
@@ -82,16 +71,13 @@ public class FeaturedNeighbourhoods {
     }
 
     public void verifyFindOutMoreBtn() {
-        try {
-            WebElement btnFindOutMore = currentSelection.findElement(By.xpath(
-                    ".//a[text()='Find Out More']"));
-            Wait<WebDriver> wait = new WebDriverWait(driver, Duration.ofSeconds(5));
-            wait.until(d -> btnFindOutMore.isDisplayed());
+        WebElement btnFindOutMore = currentSelection.findElement(By.xpath(
+                ".//a[text()='Find Out More']"));
+        /*Wait<WebDriver> wait = new WebDriverWait(driver, Duration.ofSeconds(5));
+        wait.until(d -> btnFindOutMore.isDisplayed());*/
+        AssertFactory.assertElementIsDisplayed(btnFindOutMore);
 
-            // Click the Find Out More button
-            Common.jsClickElement(driver, btnFindOutMore);
-        } catch (NoSuchElementException | TimeoutException e) {
-            Log.error(e.getMessage());
-        }
+        // Click the Find Out More button
+        Common.jsClickElement(driver, btnFindOutMore);
     }
 }

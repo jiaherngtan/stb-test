@@ -30,48 +30,50 @@ public class Neighbourhood {
     List<WebElement> breadcrumbNav;
 
     public void verifyWhereToEat(Map<String, String> restaurants, String selection) {
-        try {
-            String urlRestaurant = restaurants.get(selection);
-            String urlCurrent = driver.getCurrentUrl();
+        // Get the expected URL
+        String urlRestaurant = restaurants.get(selection);
 
-            // Select the restaurant
-            String selectionXPath = String.format("//*[text()='Where to Eat']/../../..//a[@aria-label='%s']", selection);
-            Log.info("xpath: {}", selectionXPath);
-            WebElement navSelectionWebsite = driver.findElement(By.xpath(selectionXPath));
+        // Current URL
+        String urlCurrent = driver.getCurrentUrl();
 
-            // Click only when it is in view, otherwise toggle the next button
-            boolean visible = Objects.requireNonNull(navSelectionWebsite.findElement(By.xpath("./../../.."))
+        // Identify the WebElement of the selected restaurant
+        String selectionXPath = String.format("//*[text()='Where to Eat']/../../..//a[@aria-label='%s']", selection);
+        Log.info("xpath: {}", selectionXPath);
+        WebElement navSelectionWebsite = driver.findElement(By.xpath(selectionXPath));
+
+        // Click only when it is in view (aria-hidden = false), otherwise toggle the next button
+        boolean visible = Objects.requireNonNull(navSelectionWebsite.findElement(By.xpath("./../../.."))
+                .getDomAttribute("aria-hidden")).equalsIgnoreCase("false");
+
+        WebElement btnArrowRight = driver.findElement(By.xpath(
+                "//*[text()='Where to Eat']/../..//button[contains(@class, 'stb-button_arrow-right')]"));
+        Common.waitUntilVisible(btnArrowRight);
+
+        while (!visible) {
+            Common.jsClickElement(driver, btnArrowRight);
+            Log.info("Clicked right");
+            Common.sleep(1);
+            visible = Objects.requireNonNull(navSelectionWebsite.findElement(By.xpath("./../../.."))
                     .getDomAttribute("aria-hidden")).equalsIgnoreCase("false");
-
-            WebElement btnArrowRight = driver.findElement(By.xpath(
-                    "//*[text()='Where to Eat']/../..//button[contains(@class, 'stb-button_arrow-right')]"));
-
-            while (!visible) {
-                Common.jsClickElement(driver, btnArrowRight);
-                Log.info("Clicked right");
-                Common.sleep(1);
-                visible = Objects.requireNonNull(navSelectionWebsite.findElement(By.xpath("./../../.."))
-                        .getDomAttribute("aria-hidden")).equalsIgnoreCase("false");
-            }
-            Log.info("Restaurant is visible");
-            Common.jsClickElement(driver, navSelectionWebsite);
-            Common.sleep(5);
-
-            // As new window is opened, instantiate a window handles to store all the windows
-            Object[] windowHandles = driver.getWindowHandles().toArray();
-
-            // Make sure the detail page is opened on a new tab
-            // windowHandles[0] - original tab; windowHandles[1] - new tab
-            driver.switchTo().window((String) windowHandles[1]);
-            AssertFactory.assertSameText(driver.getCurrentUrl(), urlRestaurant);
-
-            // Close the current tab and switch back to neighbourhood page
-            driver.close();
-            driver.switchTo().window((String) windowHandles[0]);
-            AssertFactory.assertSameText(driver.getCurrentUrl(), urlCurrent);
-        } catch (NoSuchElementException | TimeoutException e) {
-            Log.error(e.getMessage());
         }
+        Log.info("Restaurant is visible");
+        Common.jsClickElement(driver, navSelectionWebsite);
+        Common.sleep(5);
+
+        // As new window is opened, instantiate a window handles to store all the windows
+        Object[] windowHandles = driver.getWindowHandles().toArray();
+
+        // Make sure the detail page is opened on a new tab
+        // windowHandles[0] - original tab; windowHandles[1] - new tab
+        driver.switchTo().window((String) windowHandles[1]);
+        Common.sleep(3);
+        AssertFactory.assertSameText(driver.getCurrentUrl(), urlRestaurant);
+
+        // Close the current tab and switch back to neighbourhood page
+        driver.close();
+        driver.switchTo().window((String) windowHandles[0]);
+        Common.sleep(3);
+        AssertFactory.assertSameText(driver.getCurrentUrl(), urlCurrent);
     }
 
     public void verifyBreadcrumbNavPresent(String expectedBreadcrumbNav) {
@@ -86,36 +88,32 @@ public class Neighbourhood {
                 actualBreadcrumbNav.substring(0, actualBreadcrumbNav.length() - 1), expectedBreadcrumbNav);
     }
 
-    public void verifyBreadcrumbNav(String navName) {
-        try {
-            // Go to the destined location via breadcrumb navigation
-            for (WebElement nav : breadcrumbNav) {
-                String currNav = nav.getText();
-                if (currNav.equalsIgnoreCase(navName)) {
-                    nav.click();
-                    break;
-                }
+    public void navigateFromBreadcrumbNav(String navName) {
+        // Go to the destined location via breadcrumb navigation
+        for (WebElement nav : breadcrumbNav) {
+            String currNav = nav.getText();
+            if (currNav.equalsIgnoreCase(navName)) {
+                nav.click();
+                break;
             }
-
-            // Verify successful navigation by comparing the heading
-            String heading = driver.findElement(By.tagName("h1")).getText();
-            AssertFactory.assertSameText(heading, navName);
-        } catch (NoSuchElementException | TimeoutException e) {
-            Log.error(e.getMessage());
         }
+
+        // Verify successful navigation by comparing the heading
+        WebElement heading = driver.findElement(By.tagName("h1"));
+        Common.waitUntilVisible(heading);
+        AssertFactory.assertSameText(heading.getText(), navName);
     }
 
     public void verifyNumOfMrtStations(int expectedNum) {
-        try {
-            // Verify the number of MRT stations
-            WebElement nearestStationTitle = driver.findElement(By.xpath(
-                    "//*[@class='title']/following-sibling::div//*[text()='Nearest Station']"));
-            List<WebElement> stations = nearestStationTitle.findElements(By.xpath(
-                    "./following-sibling::div/p"));
+        // Verify the number of MRT stations
+        WebElement nearestStationTitle = driver.findElement(By.xpath(
+                "//div[@class='title']/following-sibling::div//*[text()='Nearest Station']"));
+        List<WebElement> stations = nearestStationTitle.findElements(By.xpath(
+                "./following-sibling::div/p"));
 
-            AssertFactory.assertSameValue(stations.size(), expectedNum);
-        } catch (NoSuchElementException | TimeoutException e) {
-            Log.error(e.getMessage());
+        for (WebElement station : stations) {
+            Log.info("Station: " + station.getDomProperty("innerHTML"));
         }
+        AssertFactory.assertSameValue(stations.size(), expectedNum);
     }
 }

@@ -5,8 +5,6 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
 
-import utility.Common;
-
 public class Home {
 
     final WebDriver driver;
@@ -25,9 +23,7 @@ public class Home {
     WebElement btnAcceptCookies;
 
     public void acceptCookies() {
-        if (cookiePrompt.isDisplayed()) {
+        if (cookiePrompt.isDisplayed())
             btnAcceptCookies.click();
-            Common.sleep(3);
-        }
     }
 }
