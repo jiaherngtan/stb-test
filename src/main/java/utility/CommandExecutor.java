@@ -3,8 +3,8 @@ package utility;
 import models.FeaturedNeighbourhoods;
 import models.Home;
 import models.MainNavigation;
-
 import models.Neighbourhood;
+
 import org.openqa.selenium.WebDriver;
 
 import java.net.SocketException;
