@@ -51,6 +51,7 @@ public class FeaturedNeighbourhoods {
     public void selectNeighbourhoodFromMap(String selectedNeighbourhood) {
         // Click the icon
         Common.jsClickElement(driver, getIcon(selectedNeighbourhood));
+        Log.info("Selected neighbourhood {} clicked", selectedNeighbourhood);
         Common.sleep(3);
 
         // Verify the current selection is updated

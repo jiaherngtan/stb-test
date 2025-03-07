@@ -45,11 +45,6 @@ public class MainNavigation {
     @FindBy(id = "searchField")
     WebElement searchField;
 
-    // Getter
-    public String getTitle() {
-        return driver.getTitle();
-    }
-
     // Navigation
     public void hoverOverNeighbourhoodsMenu() {
         // Hover to the neighbourhoods sub-menu
