@@ -26,7 +26,7 @@ public class WebAppTest {
     }
 
     @Test(priority = 1, retryAnalyzer = utility.RetryFailedTestCases.class, groups = {"Start from Homepage"},
-            description = "verify the page title on the home page")
+            description = "verify the page title of the home page")
     public void verifyPageTitle() {
         // Test data
         String expectedPageTitle = "Visit Singapore Official Site - Discover Singapore's Best Attractions";
@@ -36,7 +36,7 @@ public class WebAppTest {
 
     @Test(priority = 2, retryAnalyzer = utility.RetryFailedTestCases.class,
             description = "verify list of selections under 'Neighbourhoods' in nav menu, " +
-            "and <neighbourhood> is one of the selection")
+            "and <selected neighbourhood> is one of the selection")
     public void verifyListOfNeighbourhoods() {
         // Test data
         List<String> neighbourhoods = List.of(
@@ -50,7 +50,7 @@ public class WebAppTest {
     }
 
     @Test(priority = 3, retryAnalyzer = utility.RetryFailedTestCases.class, groups = {"Start from Homepage"},
-            description = "verify able to visit 'Featured Neighbourhood and showing the correct default selection")
+            description = "verify able to visit 'Featured Neighbourhood' and showing the correct default selection")
     public void verifyFeaturedNeighbourhoods() {
         // Test data
         String defaultSelection = "Civic District";
@@ -59,7 +59,7 @@ public class WebAppTest {
         commandExecutor.verifyFeaturedNeighbourhoods(defaultSelection);
     }
 
-    @Test(priority = 4, description = "select the <neighbourhood> icon from the map and verify the description")
+    @Test(priority = 4, description = "select <selected neighbourhood> icon from the map and verify the description")
     public void verifyNeighbourhoodIcon() {
         // Test data
         String selectedNeighbourhood = "Marina Bay";
@@ -69,7 +69,7 @@ public class WebAppTest {
         commandExecutor.verifyMapIconState(selectedNeighbourhood, true);
     }
 
-    @Test(priority = 5, description = "switch to Sentosa icon and make sure both icons change")
+    @Test(priority = 5, description = "switch to <new selected neighbourhood> icon and make sure both icons change")
     public void switchSelectionOnMap() {
         // Test data
         String selectedNeighbourhood = "Marina Bay";
@@ -80,7 +80,7 @@ public class WebAppTest {
         commandExecutor.verifyMapIconState(selectedNewNeighbourhood, true);
     }
 
-    @Test(priority = 6, description = "select 'Find out more' button")
+    @Test(priority = 6, description = "click 'Find out more' button")
     public void verifyFindOutMoreBtn() {
         commandExecutor.verifyFindOutMoreBtn();
     }
@@ -114,10 +114,10 @@ public class WebAppTest {
     public void verifyBreadcrumbNav() {
         // Test data
         String navName = "Marina Bay";
-        int expectedNum = 4;
+        int expectedNumOfMRTs = 4;
 
         commandExecutor.navigateFromBreadcrumbNav(navName);
-        commandExecutor.verifyNumOfMrtStations(expectedNum);
+        commandExecutor.verifyNumOfMrtStations(expectedNumOfMRTs);
     }
 
     @BeforeMethod(onlyForGroups = {"Start from Homepage"}, alwaysRun = true)
