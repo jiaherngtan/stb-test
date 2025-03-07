@@ -9,7 +9,7 @@ Simple web application testing using Java Selenium and TestNG
 ### Project Structure
 * src/main/java/models      # Page Objects
 * src/main/java/utility     # Utility classes
-* src/test/jav/             # Test cases
+* src/test/java/             # Test cases
 
 
 ### Run Tests
@@ -17,4 +17,5 @@ Simple web application testing using Java Selenium and TestNG
 * mvn test -DsuiteXmlFile=testng.xml
 
 ### Report Screenshot Sample
+[emailable-report.html](test-output/emailable-report.html)
 ![Image](https://github.com/user-attachments/assets/e32bb279-bb1d-42ad-ab78-72128f283041)
