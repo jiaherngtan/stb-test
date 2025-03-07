@@ -5,6 +5,10 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
 
+import utility.AssertFactory;
+
+import java.util.Objects;
+
 public class Home {
 
     final WebDriver driver;
@@ -25,5 +29,9 @@ public class Home {
     public void acceptCookies() {
         if (cookiePrompt.isDisplayed())
             btnAcceptCookies.click();
+    }
+
+    public void verifyPageTitle(String expectedPageTitle) {
+        AssertFactory.assertSameText(Objects.requireNonNull(driver.getTitle()), expectedPageTitle);
     }
 }

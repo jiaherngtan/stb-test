@@ -3,6 +3,8 @@ package utility;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 
+import java.net.SocketException;
+
 public class WebDriverInit {
 
     protected static WebDriver driver;
@@ -16,5 +18,9 @@ public class WebDriverInit {
         driver = new ChromeDriver();
         driver.manage().window().maximize();
         return driver;
+    }
+
+    public void closeDriver(WebDriver driver) throws SocketException {
+        driver.quit();
     }
 }

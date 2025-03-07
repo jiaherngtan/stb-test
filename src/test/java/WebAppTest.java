@@ -1,58 +1,40 @@
-import models.FeaturedNeighbourhoods;
-import models.Home;
-import models.MainNavigation;
-
-import models.Neighbourhood;
-import org.openqa.selenium.WebDriver;
+import org.testng.ITestResult;
 import org.testng.annotations.*;
 
-import utility.AssertFactory;
-import utility.Common;
-import utility.WebDriverInit;
+import utility.*;
 
 import java.util.List;
 import java.util.Map;
 
+//@Listeners(RetryListener.class)
 public class WebAppTest {
 
-    protected static WebDriver driver;
-
-    protected static MainNavigation mainNavigation;
-
-    protected static Home home;
-
-    protected static FeaturedNeighbourhoods featuredNeighbourhoods;
-
-    protected static Neighbourhood neighbourhood;
+    private static final CommandExecutor commandExecutor = new CommandExecutor();
 
     @BeforeSuite
     public void testSuiteSetup() {
-        // Initialize WebDriver and all the models
-        driver = new WebDriverInit().initializeDriver();
-        mainNavigation = new MainNavigation(driver);
-        home = new Home(driver);
-        featuredNeighbourhoods = new FeaturedNeighbourhoods(driver);
-        neighbourhood = new Neighbourhood(driver);
+        // Initialize WebDriver
+        commandExecutor.startWebDriver();
 
         // Go to homepage
-        driver.get(Common.VISIT_SINGAPORE_URL);
-        Common.sleep(3);
+        commandExecutor.goToPage(Common.VISIT_SINGAPORE_URL);
+        Common.sleep(5);
 
         // Accept cookies if any
-        home.acceptCookies();
-
+        commandExecutor.acceptCookies();
         Common.sleep(3);
     }
 
-    @Test(priority = 1, groups = {"Start from Homepage"},
+    @Test(priority = 1, retryAnalyzer = utility.RetryFailedTestCases.class, groups = {"Start from Homepage"},
             description = "verify the page title on the home page")
     public void verifyPageTitle() {
         // Test data
         String expectedPageTitle = "Visit Singapore Official Site - Discover Singapore's Best Attractions";
-        AssertFactory.assertSameText(mainNavigation.getTitle(), expectedPageTitle);
+
+        commandExecutor.verifyPageTitle(expectedPageTitle);
     }
 
-    @Test(priority = 2, groups = {"Start from Homepage"},
+    @Test(priority = 2, retryAnalyzer = utility.RetryFailedTestCases.class,
             description = "verify list of selections under 'Neighbourhoods' in nav menu, " +
             "and <neighbourhood> is one of the selection")
     public void verifyListOfNeighbourhoods() {
@@ -62,44 +44,45 @@ public class WebAppTest {
                 "Little India", "Mandai", "Marina Bay", "Orchard Road", "Sentosa Island", "Singapore River");
         String selectedNeighbourhood = "Orchard Road";
 
-        mainNavigation.verifyListOfNeighbourhoods(neighbourhoods);
-        mainNavigation.verifyListContainsNeighbourhood(selectedNeighbourhood);
+        commandExecutor.hoverOverNeighbourhoodsMenu();
+        commandExecutor.verifyListOfNeighbourhoods(neighbourhoods);
+        commandExecutor.verifyListContainsNeighbourhood(selectedNeighbourhood);
     }
 
-    @Test(priority = 3, groups = {"Start from Homepage"},
+    @Test(priority = 3, retryAnalyzer = utility.RetryFailedTestCases.class, groups = {"Start from Homepage"},
             description = "verify able to visit 'Featured Neighbourhood and showing the correct default selection")
     public void verifyFeaturedNeighbourhoods() {
         // Test data
         String defaultSelection = "Civic District";
 
-        mainNavigation.goToFeaturedNeighbourhoodsPage();
-        featuredNeighbourhoods.verifyFeaturedNeighbourhoods(defaultSelection);
+        commandExecutor.goToFeaturedNeighbourhoodsPage();
+        commandExecutor.verifyFeaturedNeighbourhoods(defaultSelection);
     }
 
     @Test(priority = 4, description = "select the <neighbourhood> icon from the map and verify the description")
     public void verifyNeighbourhoodIcon() {
         // Test data
-        String neighbourhood = "Marina Bay";
+        String selectedNeighbourhood = "Marina Bay";
 
-        //mainNavigation.goToFeaturedNeighbourhoodsPage();
-        featuredNeighbourhoods.selectNeighbourhoodFromMap(neighbourhood);
-        featuredNeighbourhoods.verifyMapIconState(neighbourhood, true);
+        //commandExecutor.goToFeaturedNeighbourhoodsPage();
+        commandExecutor.selectNeighbourhoodFromMap(selectedNeighbourhood);
+        commandExecutor.verifyMapIconState(selectedNeighbourhood, true);
     }
 
     @Test(priority = 5, description = "switch to Sentosa icon and make sure both icons change")
     public void switchSelectionOnMap() {
         // Test data
-        String neighbourhood = "Marina Bay";
-        String newNeighbourhood = "Sentosa";
+        String selectedNeighbourhood = "Marina Bay";
+        String selectedNewNeighbourhood = "Sentosa";
 
-        featuredNeighbourhoods.selectNeighbourhoodFromMap(newNeighbourhood);
-        featuredNeighbourhoods.verifyMapIconState(neighbourhood, false);
-        featuredNeighbourhoods.verifyMapIconState(newNeighbourhood, true);
+        commandExecutor.selectNeighbourhoodFromMap(selectedNewNeighbourhood);
+        commandExecutor.verifyMapIconState(selectedNeighbourhood, false);
+        commandExecutor.verifyMapIconState(selectedNewNeighbourhood, true);
     }
 
     @Test(priority = 6, description = "select 'Find out more' button")
     public void verifyFindOutMoreBtn() {
-        featuredNeighbourhoods.verifyFindOutMoreBtn();
+        commandExecutor.verifyFindOutMoreBtn();
     }
 
     @Test(priority = 7, description = "select a restaurant from 'Where to eat', " +
@@ -112,18 +95,19 @@ public class WebAppTest {
                 "Imamura", "https://imamurasg.com/");
         String selection = "Ocean Restaurant";
 
-        neighbourhood.verifyWhereToEat(restaurants, selection);
+        commandExecutor.verifyWhereToEat(restaurants, selection);
     }
 
-    @Test(priority = 8, groups = {"Start from Homepage"}, description = "check the search icon functionalities, " +
+    @Test(priority = 8, retryAnalyzer = utility.RetryFailedTestCases.class, groups = {"Start from Homepage"},
+            description = "check the search icon functionalities, " +
             "perform search and verify the presence of breadcrumb navigation feature")
     public void verifySearchFunction() {
         // Test data
         String searchString = "Gardens by the bay";
         String expectedBreadcrumbNav = "Home;Featured Neighbourhoods;Marina Bay"; // separated by semicolon
 
-        mainNavigation.verifySearchFunction(searchString);
-        neighbourhood.verifyBreadcrumbNavPresent(expectedBreadcrumbNav);
+        commandExecutor.verifySearchFunction(searchString);
+        commandExecutor.verifyBreadcrumbNavPresent(expectedBreadcrumbNav);
     }
 
     @Test(priority = 9, description = "go to <neighbourhood> via breadcrumb navigation, and verify the numbers of MRT")
@@ -132,21 +116,25 @@ public class WebAppTest {
         String navName = "Marina Bay";
         int expectedNum = 4;
 
-        neighbourhood.verifyBreadcrumbNav(navName);
-        neighbourhood.verifyNumOfMrtStations(expectedNum);
+        commandExecutor.navigateFromBreadcrumbNav(navName);
+        commandExecutor.verifyNumOfMrtStations(expectedNum);
     }
 
-    @BeforeGroups(groups={"Start from Homepage"}, alwaysRun = true)
+    @BeforeMethod(onlyForGroups = {"Start from Homepage"}, alwaysRun = true)
     public void goToHome() {
-        mainNavigation.backToHomePage();}
+        commandExecutor.backToHomePage();
+        Common.sleep(3);
+    }
 
     @AfterMethod
-    public void sleep() {
-        Common.sleep(3);
+    public void afterMethod(ITestResult result) {
+        if (result.getStatus() == ITestResult.FAILURE || result.getStatus() == ITestResult.SKIP) {
+            System.out.println("Test failed / skipped");
+        }
     }
 
     @AfterSuite
     public void cleanUp() {
-        driver.quit();
+        commandExecutor.closeWebDriver();
     }
 }
